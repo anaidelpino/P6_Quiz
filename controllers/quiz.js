@@ -171,6 +171,7 @@ exports.check = (req, res, next) => {
                 .then(ids => ids[Math.floor(Math.random() * ids.length)])
                 .then(id => models.quiz.findById(id)
                     .then(quiz => {
+                        
                         res.render('quizzes/random_play', {
                             score: req.session.randomPlay.length,
                             quiz: quiz
