@@ -153,3 +153,47 @@ exports.check = (req, res, next) => {
         answer
     });
 };
+ exports.randomplay = (req, res, next) =>{
+        if( !req.session.randomPlay) req.session.randomPlay = [];// aqui guardaremos los id de las preguntas contestadas
+        // DUDA: AQUI SE GUARDAN LOS ID SOLOS? CADA VEZ QUE RENDERIZAMOS UNO SE GUARDA?
+        //CONTESTACIÓN: randomPlay y random check van encadenados, uno llama a una vista y en esa
+        //vista se llama al otro, que tras comprobar si esta bien contestada la pregunta, añade el id
+        models.quiz.count({where: {id: {[Op.notIn]: req.session.randomPlay}}}) // CONTAMOS LOS ID DE LAS PREGUNTAS QUE NO ESTAN EN EL ALMACEN
+        .then{count => { //COUNT SERA EL NUMERO DE LAS QUE NO ESTAN DENTRO
+            if (count === 0){ //habremos respondido a todas
+                req.session.randomPlay = []; //reiniciamos el almacén
+                res.render('quizzes/random_none', {score: score});//una vez hemos terminado cargamos la vista nomore y le pasamos puntuación
+            }else{
+                models.quiz.findAll()
+                .then(quizzes => quizzes.map(quiz => quiz.id))//mapeamos cada quiz a un id propio y como resultado pasamos un array de ids
+                .then(ids => ids.filter(id => req.session.randomPlay.indexOf(id) === -1)) //Que sentido tiene?
+                .then(ids => ids[Math.floor(Math.random() * ids.length)])
+                .then(id => models.quiz.findById(id)
+                    .then(quiz => {
+                        res.render('quizzes/random_play', {
+                            score: req.session.randomPlay.length,
+                            quiz: quiz
+                        });
+                    }))
+                .catch(err => console.log(err));
+
+
+            }
+        }}
+    };
+     exports.randomcheck = (req, res, next) => {
+        const {quiz, query} = req;
+        //de donde vienen quiz y query?
+        const answer = query.answer || "";
+        const result = answer.toLowerCase().trim() === quiz.answer.toLowerCase().trim();
+        let lastScore =req.session.randomPlay.length;
+
+        result ? req.session.randomPlay.push(quiz.id) : req.session.randomPlay = []; //si acertamos, lo añade y si fallamos reinicia
+
+        res.render('quizzes/radom_result', {
+            answer,
+            quiz,
+            result,
+            score: result ? ++lastScore : lastScore
+        });
+    };
