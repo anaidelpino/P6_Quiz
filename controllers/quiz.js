@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const {models} = require("../models");
+const Op = Sequelize.Op;
 
 // Autoload the quiz with id equals to :quizId
 exports.load = (req, res, next, quizId) => {
@@ -159,7 +160,7 @@ exports.check = (req, res, next) => {
         //CONTESTACIÓN: randomPlay y random check van encadenados, uno llama a una vista y en esa
         //vista se llama al otro, que tras comprobar si esta bien contestada la pregunta, añade el id
         models.quiz.count({where: {id: {[Op.notIn]: req.session.randomPlay}}}) // CONTAMOS LOS ID DE LAS PREGUNTAS QUE NO ESTAN EN EL ALMACEN
-        .then{count => { //COUNT SERA EL NUMERO DE LAS QUE NO ESTAN DENTRO
+        .then(count => { //COUNT SERA EL NUMERO DE LAS QUE NO ESTAN DENTRO
             if (count === 0){ //habremos respondido a todas
                 req.session.randomPlay = []; //reiniciamos el almacén
                 res.render('quizzes/random_none', {score: score});//una vez hemos terminado cargamos la vista nomore y le pasamos puntuación
@@ -179,7 +180,7 @@ exports.check = (req, res, next) => {
 
 
             }
-        }}
+        })
     };
      exports.randomcheck = (req, res, next) => {
         const {quiz, query} = req;
@@ -190,7 +191,7 @@ exports.check = (req, res, next) => {
 
         result ? req.session.randomPlay.push(quiz.id) : req.session.randomPlay = []; //si acertamos, lo añade y si fallamos reinicia
 
-        res.render('quizzes/radom_result', {
+        res.render('quizzes/random_result', {
             answer,
             quiz,
             result,
