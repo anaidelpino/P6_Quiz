@@ -159,7 +159,7 @@ exports.check = (req, res, next) => {
         // DUDA: AQUI SE GUARDAN LOS ID SOLOS? CADA VEZ QUE RENDERIZAMOS UNO SE GUARDA?
         //CONTESTACIÓN: randomPlay y random check van encadenados, uno llama a una vista y en esa
         //vista se llama al otro, que tras comprobar si esta bien contestada la pregunta, añade el id
-        models.quiz.count({where: {id: {[Op.notIn]: req.session.randomPlay}}}) // CONTAMOS LOS ID DE LAS PREGUNTAS QUE NO ESTAN EN EL ALMACEN
+        models.quiz.count({where: {id: {[Sequelize.Op.notIn]: req.session.randomPlay}}}) // CONTAMOS LOS ID DE LAS PREGUNTAS QUE NO ESTAN EN EL ALMACEN
         .then(count => { //COUNT SERA EL NUMERO DE LAS QUE NO ESTAN DENTRO
             if (count === 0){ //habremos respondido a todas
                 req.session.randomPlay = []; //reiniciamos el almacén
@@ -171,7 +171,7 @@ exports.check = (req, res, next) => {
                 .then(ids => ids[Math.floor(Math.random() * ids.length)])
                 .then(id => models.quiz.findById(id)
                     .then(quiz => {
-                        
+
                         res.render('quizzes/random_play', {
                             score: req.session.randomPlay.length,
                             quiz: quiz
