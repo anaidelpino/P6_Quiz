@@ -174,6 +174,7 @@ exports.randomplay = (req, res, next) =>{
     }else{ps = req.session.quizzes}
     if(ps.length === 0){
         var score = req.session.score;
+
         res.render('quizzes/random_none', {score: score});
     }else{
         lon = req.session.quizzes.length;
@@ -194,7 +195,17 @@ exports.randomcheck = (req, res, next) => {
     const answer = query.answer || "";
     const result = answer.toLowerCase().trim() === quiz.answer.toLowerCase().trim();
 
-    if (result) req.session.score++;
+    if (result) {
+        req.session.score++;
+    }else{
+        req.session.score=0;
+    }
+    if(req.session.quizzes.length===0){
+        req.session.quizzes=undefined
+        var score = req.session.score;
+        req.session.score=undefined;
+        res.render('quizzes/random_none', {score: score});
+    }else{
 
     res.render('quizzes/random_result', {
         answer: answer,
@@ -202,6 +213,7 @@ exports.randomcheck = (req, res, next) => {
         result: result,
         score: req.session.score
     });
+}
 
 };
  /*exports.randomplay = (req, res, next) =>{
