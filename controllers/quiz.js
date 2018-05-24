@@ -154,12 +154,62 @@ exports.check = (req, res, next) => {
         answer
     });
 };
- exports.randomplay = (req, res, next) =>{
+exports.randomplay = (req, res, next) =>{
+    const {quiz, query} = req;
+    const answer = query.answer || "";
+    var lon = 0;
+    var ps = [];
+
+    //creo una variable global score de la sesion:
+    if(!req.session.score) req.session.score = 0;
+    //hago lo mismo con un almacen de quizzes
+    if(!req.session.quizzes){
+        models.quiz.findAll()
+        .then(quizzes => {
+            
+            req.session.quizzes = quizzes;
+
+        })
+        .catch(err => console.log(err));
+    }else{ps = req.session.quizzes}
+    if(ps.length === 0){
+        var score = req.session.score;
+        res.render('quizzes/random_none', {score: score});
+    }else{
+        lon = req.session.quizzes.length;
+        var i = Math.floor(Math.random() * lon);
+        var q = req.session.quizzes[i];
+        req.session.quizzes.splice(i, 1);
+        res.render('quizzes/random_play', {
+            score: score,
+            quiz: q
+        });
+    }
+
+
+};
+exports.randomcheck = (req, res, next) => {
+    const {quiz, query} = req;
+
+    const answer = query.answer || "";
+    const result = answer.toLowerCase().trim() === quiz.answer.toLowerCase().trim();
+
+    if (result) req.session.score++;
+
+    res.render('quizzes/random_result', {
+        answer: answer,
+        quiz: quiz,
+        result: result,
+        score: req.session.score
+    });
+
+};
+ /*exports.randomplay = (req, res, next) =>{
         if( !req.session.randomPlay) req.session.randomPlay = [];// aqui guardaremos los id de las preguntas contestadas
         // DUDA: AQUI SE GUARDAN LOS ID SOLOS? CADA VEZ QUE RENDERIZAMOS UNO SE GUARDA?
         //CONTESTACIÓN: randomPlay y random check van encadenados, uno llama a una vista y en esa
         //vista se llama al otro, que tras comprobar si esta bien contestada la pregunta, añade el id
-        models.quiz.count({where: {id: {[Sequelize.Op.notIn]: req.session.randomPlay}}}) // CONTAMOS LOS ID DE LAS PREGUNTAS QUE NO ESTAN EN EL ALMACEN
+        models.quiz.count({where: {id: {[Op.notIn]: req.session.randomPlay}}}) // CONTAMOS LOS ID DE LAS PREGUNTAS QUE NO ESTAN EN EL ALMACEN
         .then(count => { //COUNT SERA EL NUMERO DE LAS QUE NO ESTAN DENTRO
             if (count === 0){ //habremos respondido a todas
                 req.session.randomPlay = []; //reiniciamos el almacén
@@ -171,7 +221,7 @@ exports.check = (req, res, next) => {
                 .then(ids => ids[Math.floor(Math.random() * ids.length)])
                 .then(id => models.quiz.findById(id)
                     .then(quiz => {
-
+                        
                         res.render('quizzes/random_play', {
                             score: req.session.randomPlay.length,
                             quiz: quiz
@@ -185,7 +235,6 @@ exports.check = (req, res, next) => {
     };
      exports.randomcheck = (req, res, next) => {
         const {quiz, query} = req;
-        
         //de donde vienen quiz y query?
         const answer = query.answer || "";
         const result = answer.toLowerCase().trim() === quiz.answer.toLowerCase().trim();
@@ -199,4 +248,4 @@ exports.check = (req, res, next) => {
             result,
             score: result ? ++lastScore : lastScore
         });
-    };
+    };*/
