@@ -185,6 +185,7 @@ exports.check = (req, res, next) => {
     };
      exports.randomcheck = (req, res, next) => {
         const {quiz, query} = req;
+        
         //de donde vienen quiz y query?
         const answer = query.answer || "";
         const result = answer.toLowerCase().trim() === quiz.answer.toLowerCase().trim();
