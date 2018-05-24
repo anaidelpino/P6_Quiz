@@ -194,15 +194,18 @@ exports.randomcheck = (req, res, next) => {
 
     const answer = query.answer || "";
     const result = answer.toLowerCase().trim() === quiz.answer.toLowerCase().trim();
-
+    var score;
+    
     if (result) {
         req.session.score++;
+        score = req.session.score;
     }else{
+        score = req.session.score;
         req.session.score=0;
+        
     }
     if(req.session.quizzes.length===0){
         req.session.quizzes=undefined
-        var score = req.session.score;
         req.session.score=undefined;
         res.render('quizzes/random_none', {score: score});
     }else{
@@ -211,7 +214,7 @@ exports.randomcheck = (req, res, next) => {
         answer: answer,
         quiz: quiz,
         result: result,
-        score: req.session.score
+        score: score
     });
 }
 
