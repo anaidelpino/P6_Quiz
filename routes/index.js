@@ -52,6 +52,13 @@ router.get('/author', (req, res, next) => {
 });
 
 
+
+// Random Play
+router.get('/quizzes/randomplay', quizController.randomPlay);
+// el form de randomplay ejecuta esta ruta
+router.get('/quizzes/randomcheck/:quizId(\\d+)', quizController.randomCheck);
+
+
 // Autoload for routes using :quizId
 router.param('quizId', quizController.load);
 router.param('userId', userController.load);
@@ -67,55 +74,54 @@ router.delete('/session', sessionController.destroy); // close sesion
 // Routes for the resource /users
 router.get('/users',
     sessionController.loginRequired,
-	userController.index);
+    userController.index);
 router.get('/users/:userId(\\d+)',
     sessionController.loginRequired,
-	userController.show);
+    userController.show);
 router.get('/users/new',
-	userController.new);
+    userController.new);
 router.post('/users',
-	userController.create);
+    userController.create);
 router.get('/users/:userId(\\d+)/edit',
     sessionController.loginRequired,
     sessionController.adminOrMyselfRequired,
-	userController.edit);
+    userController.edit);
 router.put('/users/:userId(\\d+)',
     sessionController.loginRequired,
     sessionController.adminOrMyselfRequired,
-	userController.update);
+    userController.update);
 router.delete('/users/:userId(\\d+)',
     sessionController.loginRequired,
     sessionController.adminOrMyselfRequired,
-	userController.destroy);
+    userController.destroy);
 
 router.get('/users/:userId(\\d+)/quizzes',
     sessionController.loginRequired,
     quizController.index);
 
-
 // Routes for the resource /quizzes
 router.get('/quizzes',
-	quizController.index);
+    quizController.index);
 router.get('/quizzes/:quizId(\\d+)',
-	quizController.show);
+    quizController.show);
 router.get('/quizzes/new',
     sessionController.loginRequired,
-	quizController.new);
+    quizController.new);
 router.post('/quizzes',
     sessionController.loginRequired,
-	quizController.create);
+    quizController.create);
 router.get('/quizzes/:quizId(\\d+)/edit',
     sessionController.loginRequired,
     quizController.adminOrAuthorRequired,
-	quizController.edit);
+    quizController.edit);
 router.put('/quizzes/:quizId(\\d+)',
     sessionController.loginRequired,
     quizController.adminOrAuthorRequired,
-	quizController.update);
+    quizController.update);
 router.delete('/quizzes/:quizId(\\d+)',
     sessionController.loginRequired,
     quizController.adminOrAuthorRequired,
-	quizController.destroy);
+    quizController.destroy);
 
 router.get('/quizzes/:quizId(\\d+)/play',  quizController.play);
 router.get('/quizzes/:quizId(\\d+)/check', quizController.check);
