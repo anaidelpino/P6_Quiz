@@ -9,7 +9,7 @@ module.exports = {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false
             }
-        );
+        )
     },
 
     down(queryInterface, Sequelize) {
